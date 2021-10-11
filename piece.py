@@ -28,3 +28,26 @@ class Piece:
     def __init__(self, piece_type: PieceType, piece_color: bool):
         self.p_type = piece_type
         self.p_color = piece_color
+
+    def get_letter(self) -> str:
+        if self.p_type is PieceType.KING:
+            letter = 'k'
+        elif self.p_type is PieceType.QUEEN:
+            letter = 'q'
+        elif self.p_type is PieceType.ROOK:
+            letter = 'r'
+        elif self.p_type is PieceType.BISHOP:
+            letter = 'b'
+        elif self.p_type is PieceType.KNIGHT:
+            letter = 'n'
+        elif self.p_type is PieceType.PAWN:
+            letter = 'p'
+        else:
+            raise Exception('Unknown Piece')
+        if self.p_color:
+            letter.upper()
+        return letter
+
+    def get_image_file_string(self):
+        letter = self.get_letter().upper() + '-' + ('W' if self.p_color else 'B') + '.png'
+        return letter

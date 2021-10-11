@@ -20,6 +20,9 @@ class Location:
     def tile_color(self) -> bool:
         return (self.row + self.col) % 2 == 0
 
+    def reverse(self) -> 'Location':
+        return Location(self.col, self.row)
+
     @staticmethod
     def key_tile_color(loc: LocationKey) -> bool:
         return Location(loc).tile_color()

@@ -2,11 +2,35 @@ import sys
 import pygame
 from chess_utility import Location, LocationKey
 from board import Board
+IMAGE_PATH = './Assets/piece_imgs_png/'
 LIGHT_SQUARES = (255, 255, 255)
-BOARD_BORDER = (210, 210, 210)
+BOARD_BORDER_COLOR = (210, 210, 210)
 DARK_SQUARES = (50, 50, 50)
 TILE_SIZE = 80
 BOARD_OFFSET = 40
+
+
+class Tile:
+    tile_size = (TILE_SIZE, TILE_SIZE)
+
+    def __init__(self, loc: Location, board: Board, display: 'Display'):
+        self.loc = loc
+        self.color = LIGHT_SQUARES if loc.tile_color() else DARK_SQUARES
+        board_offsets = display.board_offsets
+        self.offsets = (board_offsets[0] + TILE_SIZE * (loc.col - 1), board_offsets[1] + TILE_SIZE * (loc.row - 1))
+        self.bg_rect = pygame.Rect(self.offsets, (TILE_SIZE, TILE_SIZE))
+        pygame.draw.rect(display.window, self.color, self.bg_rect)
+        self.piece_rects = []
+
+        if board.hasPiece(loc):
+            piece_img_str = board.getPiece(loc).get_image_file_string()
+            piece_img = pygame.image.load(IMAGE_PATH + piece_img_str)
+            piece_img = pygame.transform.scale(piece_img, self.tile_size)
+            piece_rect = display.window.blit(piece_img, self.offsets)
+            self.piece_rects.append(piece_rect)
+
+    def draw(self, window, board: Board):
+        pygame.draw.rect(window, self.color, self.bg_rect)
 
 
 class Display:
@@ -17,16 +41,12 @@ class Display:
         window_size = (self.board_size[0] + BOARD_OFFSET, self.board_size[1] + BOARD_OFFSET)
         self.window = pygame.display.set_mode(window_size)
         self.board = pygame.Rect(self.board_offsets[0], self.board_offsets[1], self.board_size[0], self.board_size[1])
-        pygame.draw.rect(self.window, BOARD_BORDER, self.board)
+        pygame.draw.rect(self.window, BOARD_BORDER_COLOR, self.board)
+
+        self.tiles = []
 
         for key in range(board.b_size**2):
-            self.drawTile(Location(key))
-
-    def drawTile(self, loc: Location):
-        tile_offsets = (self.board_offsets[0] + TILE_SIZE * (loc.row - 1), self.board_offsets[1] + TILE_SIZE * (loc.col - 1))
-        tile = pygame.Rect(tile_offsets[0], tile_offsets[1], TILE_SIZE, TILE_SIZE)
-        tile_color = LIGHT_SQUARES if loc.tile_color() else DARK_SQUARES
-        pygame.draw.rect(self.window, tile_color, tile)
+            self.tiles.append(Tile(Location(key), board, self))
 
     def update(self, board: Board):
         for event in pygame.event.get():
