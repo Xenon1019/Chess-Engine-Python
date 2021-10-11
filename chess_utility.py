@@ -8,6 +8,17 @@ class Location:
         col = key % boardSize + 1
         return Location(row, col)
 
+    @staticmethod
+    def str_to_loc(loc: str, board_size=8) -> 'Location':
+        loc = loc.rstrip().lstrip()
+        if not (loc.isalnum() and len(loc) == 2):
+            raise Exception('Invalid location argument given')
+        rank = int(loc[1])
+        rank = board_size - rank + 1
+        file = loc[0].lower()
+        file = ord(file) - ord('a') + 1
+        return Location(rank, file)
+
     def __init__(self, row: int, col: int):
         self.row, self.col = row, col
 
@@ -31,18 +42,9 @@ class Location:
     def print_coord(self):
         print(f'({self.col}, {self.row})')
 
-    @staticmethod
-    def str_to_loc(loc: str, board_size=8) -> 'Location':
-        loc = loc.rstrip().lstrip()
-        if not (loc.isalnum() and len(loc) == 2):
-            raise Exception('Invalid location argument given')
-        rank = int(loc[1])
-        rank = board_size - rank + 1
-        file = loc[0].lower()
-        file = ord(file) - ord('a') + 1
-        return Location(rank, file)
+    def to_str(self, board_size=8) -> str:
+        assert self.inBoard(board_size)
+        rank = board_size - self.row + 1
+        file = chr(self.col + ord('a') - 1)
+        return file + str(rank)
 
-    @staticmethod
-    def key_tile_color(loc: LocationKey) -> bool:
-        return Location.key_to_location(loc).tile_color()
-        #To improve so it doesn't create an anonymous object

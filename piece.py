@@ -12,6 +12,9 @@ class PieceType(Enum):
 
 
 class Piece:
+    default_types_by_column = (
+        PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QUEEN, PieceType.KING, PieceType.BISHOP,
+        PieceType.KNIGHT, PieceType.ROOK)
 
     @staticmethod
     def all_pieces() -> list['Piece']:
@@ -19,7 +22,7 @@ class Piece:
         for piece_type in PieceType:
             for piece_color in [True, False]:
                 pieces.append(Piece(piece_type, piece_color))
-        return  pieces
+        return pieces
 
     @staticmethod
     def getDefaultPiece(loc: Location, b_size) -> 'Piece':
@@ -30,8 +33,7 @@ class Piece:
             if loc.row == 2 or loc.row == 7:
                 piece_type = PieceType.PAWN
             else:
-                p_types = (PieceType.ROOK, PieceType.KNIGHT, PieceType.BISHOP, PieceType.QUEEN, PieceType.KING, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK)
-                piece_type = p_types[loc.col - 1]
+                piece_type = Piece.default_types_by_column[loc.col - 1]
             return Piece(piece_type, piece_color)
 
     def __init__(self, piece_type: PieceType, piece_color: bool):
