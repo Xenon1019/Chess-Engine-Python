@@ -6,12 +6,12 @@ default_size = 8
 class Board:
 
     @staticmethod
-    def default_pieces(size=8) -> dict[LocationKey, Piece]:
+    def default_pieces(size=default_size) -> dict[LocationKey, Piece]:
         pieces = {}
-        for location_key in range(size * size):
-            loc_key = LocationKey(location_key)
-            if not (2 < loc_key.to_location(size)[0] < size - 1):
-                default_piece = Piece.getDefaultPiece(loc_key.to_location(size), size)
+        for loc_key in range(size * size):
+            loc = Location(loc_key, size)
+            if not (2 < loc.row < size - 1):
+                default_piece = Piece.getDefaultPiece(loc, size)
                 pieces[loc_key] = default_piece
         return pieces
 

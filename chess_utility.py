@@ -1,31 +1,25 @@
-Location = tuple[int, int]
+LocationKey = int
 
 
-class LocationKey:
-    @staticmethod
-    def to_key(location: Location, boardSize=8) -> 'LocationKey':
-        loc = (location[0] - 1) * boardSize + location[1] - 1
-        return LocationKey(loc)
+class Location:
+    def __init__(self, key: LocationKey, boardSize=8):
+        self.row = key // boardSize + 1
+        self.col = key % boardSize + 1
 
-    @staticmethod
-    def inBoard(location: Location, boardSize=8) -> bool:
-        if location[0] > boardSize or location[1] > boardSize:
+    def to_key(self, boardSize=8) -> 'LocationKey':
+        loc = (self.row - 1) * boardSize + self.col - 1
+        return loc
+
+    def inBoard(self, boardSize=8) -> bool:
+        if self.row > boardSize or self.col > boardSize:
             return False
-        if location[0] < 1 or location[1] < 1:
+        if self.row < 1 or self.col < 1:
             return False
         return True
 
+    def tile_color(self) -> bool:
+        return (self.row + self.col) % 2 == 0
+
     @staticmethod
-    def tile_color(loc: Location) -> bool:
-        return loc[0] + loc[1] % 2 == 0
-
-    def tile_color(self, board_size=8):
-        return LocationKey.tile_color(self.to_location(board_size))
-
-    def __init__(self, key_location: int):
-        self.l_key = key_location
-
-    def to_location(self, boardSize=8) -> Location:
-        row = self.l_key // boardSize + 1
-        column = self.l_key % boardSize + 1
-        return row, column
+    def key_tile_color(loc: LocationKey) -> bool:
+        return Location(loc).tile_color()
