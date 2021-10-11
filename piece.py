@@ -12,6 +12,15 @@ class PieceType(Enum):
 
 
 class Piece:
+
+    @staticmethod
+    def all_pieces() -> list['Piece']:
+        pieces = []
+        for piece_type in PieceType:
+            for piece_color in [True, False]:
+                pieces.append(Piece(piece_type, piece_color))
+        return  pieces
+
     @staticmethod
     def getDefaultPiece(loc: Location, b_size) -> 'Piece':
         if 2 < loc.row < b_size - 1:

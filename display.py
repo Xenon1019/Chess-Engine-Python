@@ -20,17 +20,29 @@ class Tile:
         self.offsets = (board_offsets[0] + TILE_SIZE * (loc.col - 1), board_offsets[1] + TILE_SIZE * (loc.row - 1))
         self.bg_rect = pygame.Rect(self.offsets, (TILE_SIZE, TILE_SIZE))
         pygame.draw.rect(display.window, self.color, self.bg_rect)
-        self.piece_rects = []
-
+        self.if_changed = False
         if board.hasPiece(loc):
             piece_img_str = board.getPiece(loc).get_image_file_string()
             piece_img = pygame.image.load(IMAGE_PATH + piece_img_str)
             piece_img = pygame.transform.scale(piece_img, self.tile_size)
-            piece_rect = display.window.blit(piece_img, self.offsets)
-            self.piece_rects.append(piece_rect)
+            display.window.blit(piece_img, self.offsets)
 
-    def draw(self, window, board: Board):
-        pygame.draw.rect(window, self.color, self.bg_rect)
+    def draw(self, board: Board, display: 'Display'):
+        if self.changed:
+            if not board.hasPiece(self.loc):
+                pygame.draw.rect(display.window, self.color, self.bg_rect)
+            else:
+                pygame.draw.rect(display.window, self.color, self.bg_rect)
+                piece_img_str = board.getPiece(self.loc).get_image_file_string()
+                piece_img = pygame.image.load(IMAGE_PATH + piece_img_str)
+                piece_img = pygame.transform.scale(piece_img, self.tile_size)
+                piece_rect = display.window.blit(piece_img, self.offsets)
+
+    def changed(self):
+        self.if_changed = True
+
+    def get_offsets(self):
+        return self.offsets
 
 
 class Display:
@@ -42,14 +54,19 @@ class Display:
         self.window = pygame.display.set_mode(window_size)
         self.board = pygame.Rect(self.board_offsets[0], self.board_offsets[1], self.board_size[0], self.board_size[1])
         pygame.draw.rect(self.window, BOARD_BORDER_COLOR, self.board)
-
         self.tiles = []
 
         for key in range(board.b_size**2):
-            self.tiles.append(Tile(Location(key), board, self))
+            self.tiles.append(Tile(Location.key_to_location(key, board.b_size), board, self))
+
+    def changed_at(self, locs: list[Location]):
+        for loc in locs:
+            self.tiles[loc.to_key()].changed()
 
     def update(self, board: Board):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+        for tile in self.tiles:
+            tile.draw(board, self)
         pygame.display.flip()

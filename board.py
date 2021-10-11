@@ -9,7 +9,7 @@ class Board:
     def default_pieces(size=default_size) -> dict[LocationKey, Piece]:
         pieces = {}
         for loc_key in range(size * size):
-            loc = Location(loc_key, size)
+            loc = Location.key_to_location(loc_key, size)
             if not (2 < loc.row < size - 1):
                 default_piece = Piece.getDefaultPiece(loc, size)
                 pieces[loc_key] = default_piece
