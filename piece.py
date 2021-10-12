@@ -3,12 +3,12 @@ from chess_utility import LocationKey, Location
 
 
 class PieceType(Enum):
-    KING = 1
-    QUEEN = 2
-    ROOK = 3
-    BISHOP = 4
-    KNIGHT = 5
-    PAWN = 6
+    KING = 'k'
+    QUEEN = 'q'
+    ROOK = 'r'
+    BISHOP = 'b'
+    KNIGHT = 'n'
+    PAWN = 'p'
 
 
 class Piece:
@@ -41,20 +41,7 @@ class Piece:
         self.p_color = piece_color
 
     def get_letter(self) -> str:
-        if self.p_type is PieceType.KING:
-            letter = 'k'
-        elif self.p_type is PieceType.QUEEN:
-            letter = 'q'
-        elif self.p_type is PieceType.ROOK:
-            letter = 'r'
-        elif self.p_type is PieceType.BISHOP:
-            letter = 'b'
-        elif self.p_type is PieceType.KNIGHT:
-            letter = 'n'
-        elif self.p_type is PieceType.PAWN:
-            letter = 'p'
-        else:
-            raise Exception('Unknown Piece')
+        letter = self.p_type.value
         if self.p_color:
             letter.upper()
         return letter
