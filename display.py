@@ -2,9 +2,10 @@ import sys
 import pygame
 from chess_utility import Location, LocationKey
 from board import Board
+
 IMAGE_PATH = './Assets/piece_imgs_png/'
 LIGHT_SQUARES = ((200, 255, 200), (255, 215, 0))
-DARK_SQUARES = ((50, 150, 50), (207, 181, 59))
+DARK_SQUARES = ((50, 150, 50), (255, 223, 0))
 BOARD_BORDER_COLOR = (210, 210, 210)
 
 TILE_SIZE = 80
@@ -34,11 +35,17 @@ class Tile:
                 piece_img_str = board.getPiece(self.loc).get_image_file_string()
                 piece_img = pygame.image.load(IMAGE_PATH + piece_img_str)
                 piece_img = pygame.transform.scale(piece_img, self.tile_size)
-                piece_rect = display.window.blit(piece_img, self.offsets)
+                display.window.blit(piece_img, self.offsets)
             self.changed = False
 
     def has_changed(self):
         self.changed = True
+
+    def highlight_toggle(self):
+
+        self.highlighted = not self.highlighted
+        self.changed = True
+        return True if self.highlighted else False
 
     def get_offsets(self):
         return self.offsets
@@ -52,21 +59,39 @@ class Display:
         window_size = (self.board_size[0] + BOARD_OFFSET, self.board_size[1] + BOARD_OFFSET)
         self.window = pygame.display.set_mode(window_size)
         self.board = pygame.Rect(self.board_offsets[0], self.board_offsets[1], self.board_size[0], self.board_size[1])
-        #pygame.draw.rect(self.window, BOARD_BORDER_COLOR, self.board)
+        # pygame.draw.rect(self.window, BOARD_BORDER_COLOR, self.board)
         self.tiles = []
+        self.loc_highlighted = None
 
-        for key in range(board.b_size**2):
+        for key in range(board.b_size ** 2):
             self.tiles.append(Tile(Location.key_to_location(key, board.b_size), board, self))
 
     def changed_at(self, locs: list[Location]):
         for loc in locs:
             self.tiles[loc.to_key()].has_changed()
 
-    def update(self, board: Board):
+    def highlight_at(self, loc: Location):
+        self.tiles[loc.to_key()].highlight_toggle()
 
+    def update(self, board: Board):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_click_loc = pygame.mouse.get_pos()
+                for tile in self.tiles:
+                    if tile.rect.collidepoint(mouse_click_loc):
+                        if self.loc_highlighted is not None:
+                            if tile.loc.to_key(board.b_size) == self.loc_highlighted:
+                                tile.highlight_toggle()
+                                self.loc_highlighted = None
+                            else:
+                                self.tiles[self.loc_highlighted].highlight_toggle()
+                                self.loc_highlighted = tile.loc.to_key(board.b_size)
+                                self.tiles[self.loc_highlighted].highlight_toggle()
+                        else:
+                            tile.highlight_toggle()
+                            self.loc_highlighted = tile.loc.to_key(board.b_size)
             else:
                 pygame.event.pump()
         for tile in self.tiles:
