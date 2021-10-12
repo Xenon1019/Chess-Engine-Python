@@ -17,6 +17,10 @@ class Board:
         return pieces
 
     @staticmethod
+    def standard_board() -> 'Board':
+        return Board(Board.default_pieces(default_size), True, default_size)
+
+    @staticmethod
     def from_fen_string(fen_string: str) -> 'Board':
         size = 8
         fen_string = fen_string.strip()

@@ -33,4 +33,13 @@ class Command:
         self.args = args
 
     def exec_command(self, board: Board):
-        pass
+        if self.token == 'move':
+            loc_from = Location.str_to_loc(self.args[0])
+            loc_to = Location.str_to_loc((self.args[1]))
+            if not (loc_from.inBoard(board.b_size) and loc_to.inBoard(board.b_size)):
+                raise Exception('Location outside the board.')
+            if not board.hasPiece(loc_from):
+                raise Exception('Does not have a piece at that location')
+            else:
+                board.movePiece(loc_from, loc_to)
+                return [loc_from, loc_to]
